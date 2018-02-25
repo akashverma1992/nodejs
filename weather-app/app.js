@@ -34,6 +34,9 @@ var options = {
 };
 
 function callback(error, response, body) {
+  if (error) {
+    console.log('Unable to ');
+  }
   // console.log(JSON.stringify(body, undefined, 2));
   console.log(`Location: ${response.body.results[0].formatted_address}`);
   console.log(`Latitude: ${response.body.results[0].geometry.location.lat}`);
