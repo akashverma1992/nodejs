@@ -1,5 +1,7 @@
-const request = require('request');
+// const request = require('request');
 const yargs = require('yargs');
+const geocode = require('./geocode/geocode');
+const weather = require('./weather/weather');
 
 console.log(`Starting app.`);
 // console.log(request);
@@ -20,28 +22,18 @@ var argv = yargs
 
 console.log(`Entered Address: ${argv.a}`);
 
-var encodedAddress = encodeURIComponent(argv.a);
-// console.log(`EncodedURL: ${encodedAddress}`);
-
-/*var options = {
-  url: 'https://maps.googleapis.com/maps/api/geocode/json?address=street%204%20east%20rohtash%20nagar%20shahadara%20delhi%20india#',
-  json: true
-};*/
-
-var options = {
-  url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodedAddress}`,
-  json: true
-};
-
-function callback(error, response, body) {
-  if (error) {
-    console.log('Unable to ');
+geocode.geocodeAddress(argv.a, (errorMessage, results) => {
+  if (errorMessage) {
+    console.log(errorMessage);
+  } else {
+    // console.log(JSON.stringify(results, undefined, 2));
+    console.log(`Address: ${results.address}`);
+    weather.forecastWeather(results.latitude, results.longitude, (errorMessage, results) => {
+      if (errorMessage) {
+        console.log(errorMessage);
+      } else {
+        console.log(JSON.stringify(results, undefined, 2));
+      }
+    });
   }
-  // console.log(JSON.stringify(body, undefined, 2));
-  console.log(`Location: ${response.body.results[0].formatted_address}`);
-  console.log(`Latitude: ${response.body.results[0].geometry.location.lat}`);
-  console.log(`Longitude: ${response.body.results[0].geometry.location.lng}`);
-}
-
-// calling request
-request(options, callback);
+});
