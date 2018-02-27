@@ -1,3 +1,6 @@
+// heroku env.port number
+const port = process.env.PORT || 3000;
+
 const express = require('express');
 
 // hbs helpers
@@ -13,8 +16,14 @@ const app = express();
 
 
 const fs = require('fs');
-// middleware function
-var myLogger = (req, res, next) => {
+
+// GET method route to respond with 'maintenance page'
+/* app.use((req, res, next) => {
+  res.render('maintenance.hbs');
+}); */
+
+// middleware logger function
+app.use((req, res, next) => {
   var now = new Date().toString();
   var logObj = JSON.stringify({
     time: now,
@@ -35,24 +44,10 @@ var myLogger = (req, res, next) => {
       i++;
     }
   }); */
-  fs.readFile('logs.json', 'UTF-8', (err, data) => {
-    if (err) throw err;
-    var lastIndexOfSqrBkt = data.lastIndexOf('}');
-    console.log(lastIndexOfSqrBkt-1);
-    /* fs.appendFile('logs.json', ',' + logObj, {del: ']'}, 'UTF-8', (err) => {
-      if (err) throw err;
-    }) */
-  });
-// console.log(fileData);
-/* fs.appendFile('logs.json', '\n' + data, 'UTF-8', (err) => {
-  if(err) throw err;
-}) */
 next();
-};
+});
 
-// calling logger function
-app.use(myLogger);
-
+// app custom view engine
 app.set('view engine', 'hbs');
 
 // middleware for routing
@@ -86,6 +81,6 @@ app.get('/bad', (req, res, next) => {
   res.send({ errorMessage: 'bad request', code: 400 });
 })
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+app.listen(port, () => {
+	console.log(`Server running on port ${port}`);
 });
