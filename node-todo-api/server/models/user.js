@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
 // Schema
 var UserSchema = mongoose.Schema({
@@ -32,21 +33,31 @@ var UserSchema = mongoose.Schema({
   }]
 });
 
+// toJson Overload
+UserSchema.methods.toJSON = function() {
+  var user = this;
+  var userObject = user.toObject();
+
+  return _.pick(userObject, ['_id', 'email']);
+};
+
 // METHODS on UserSchema
 UserSchema.methods.generateAuthToken = function() {
   var user = this;
   var access = 'auth';
   var token = jwt.sign({
-    _id: user._id.toHexString(),
+    _id: user._id.toHexString,
     access
   }, 'salt').toString();
 
-  user.tokens.push({access, token});
+  user.tokens.push({
+    access,
+    token
+  });
 
-  user.save()
-      .then(() => {
-        return token;
-      });
+  return user.save().then(() => {
+    return token;
+  });
 };
 
 // Model: 'Class used to construct documents'

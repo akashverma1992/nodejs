@@ -1,5 +1,3 @@
-// require('./config/config');
-
 const express = require('express');
 const bodyparser = require('body-parser');
 const _ = require('lodash');
@@ -27,12 +25,12 @@ app.post('/users', (req, res) => {
   // console.log(users);
 
   //users.save().then((userDocument) => {
-  users.save().then(() => {  
+  users.save().then(() => {
     return users.generateAuthToken();
     // res.send(userDocument);
   }).then((token) => {
     // res.send(user);
-    res.header('x-auth', token).send(users);
+    res.header('Bearer', token).send(users);
   }).catch((err) => {
     res.status(400).send(err);
   });
