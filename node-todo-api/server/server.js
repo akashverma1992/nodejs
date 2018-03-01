@@ -19,6 +19,13 @@ const port = process.env.PORT || 3000;
 // body-parser
 app.use(bodyparser.json());
 
+// GET '/'
+app.get('/', (req, res, next) => {
+  // console.log(req);
+  res.status(200).send();
+  next();
+});
+
 // POST /users
 app.post('/users', (req, res) => {
   // {} from which {document} will be constructed.
@@ -28,12 +35,9 @@ app.post('/users', (req, res) => {
   var users = new Users(body);
   // console.log(users);
 
-  //users.save().then((userDocument) => {
   users.save().then(() => {
     return users.generateAuthToken();
-    // res.send(userDocument);
   }).then((token) => {
-    // res.send(user);
     res.header('x-auth', token).send(users);
   }).catch((err) => {
     res.status(400).send(err);

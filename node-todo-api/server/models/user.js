@@ -3,6 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const jsjoda = require('js-joda');
+const bcrypt = require('bcrypt');
 
 // Schema
 var UserSchema = mongoose.Schema({
@@ -64,8 +65,10 @@ UserSchema.methods.generateAuthToken = function () {
 };
 
 // find user by token
+// static methods exist directly on model
 UserSchema.statics.findByToken = function (token) {
   var User = this;
+  console.log(User);
   var decoded;
   try {
     decoded = jwt.verify(token, 'salt');
