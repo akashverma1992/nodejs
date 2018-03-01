@@ -23,27 +23,34 @@ if (argSalt ===  saltHash) {
   console.log('Data changed.')  
 } */
 
-const bcrypt = require('bcrypt');
-var password = '123abc!';
+const bcrypt = require("bcrypt");
+var password = "123abc!";
+var gensalt;
+var genhash;
 
 // with promises
-bcrypt.genSalt(15, (err, salt) => {
-  bcrypt.hash(password, salt).then((hash) => {
-    var time1, time2;
-    time1 = Date.now();
-    console.log(`Time1: ${time1}`);
-    console.log(`Salt: ${salt}`);
-    console.log(`Hash: ${hash}`);
-    time2 = Date.now();
-    console.log(`Time2: ${time2}`);
+bcrypt
+  .genSalt(15)
+  .then(salt => {
+    gensalt = salt;
+    console.log(gensalt);
+    bcrypt.hash(password, gensalt).then(hash => {
+      genhash = hash;
+      console.log(genhash);
+      bcrypt.compare(password, genhash).then(res => {
+        console.log(res);
+      });
+    });
+  })
+  .catch(e => {
+    console.log(e);
   });
-});
 
-var hash = "$2a$15$uaY9BttOX97sxakkiGeL3e1tmtJ968FUlYjnZS2X3am9um.pldmT.";
+// var hash = "$2a$15$uaY9BttOX97sxakkiGeL3e1tmtJ968FUlYjnZS2X3am9um.pldmT.";
 
-bcrypt.compare(password, hash).then((value) => {
-  console.log(value);
-});
+// bcrypt.compare(password, genhash).then((res) => {
+//   console.log(res);
+// });
 
 /* bcrypt.hash(password, 10).then((hash) => {
   console.log(`Hash: ${hash}`);
