@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const jsjoda = require('js-joda');
 
 // Schema
 var UserSchema = mongoose.Schema({
@@ -34,7 +35,7 @@ var UserSchema = mongoose.Schema({
 });
 
 // toJson Overload
-UserSchema.methods.toJSON = function() {
+UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
@@ -42,13 +43,15 @@ UserSchema.methods.toJSON = function() {
 };
 
 // METHODS on UserSchema
-UserSchema.methods.generateAuthToken = function() {
+UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({
+  var jwtPayLoad = {
     _id: user._id.toHexString,
+    iss: 'express',
     access
-  }, 'salt').toString();
+  };
+  var token = jwt.sign(jwtPayLoad, 'salt').toString();
 
   user.tokens.push({
     access,
@@ -57,6 +60,23 @@ UserSchema.methods.generateAuthToken = function() {
 
   return user.save().then(() => {
     return token;
+  });
+};
+
+// find user by token
+UserSchema.statics.findByToken = function (token) {
+  var User = this;
+  var decoded;
+  try {
+    decoded = jwt.verify(token, 'salt');
+    // console.log(decoded);
+  } catch (exp) {
+    return Promise.reject();
+  }
+  return User.findOne({
+    // '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
   });
 };
 

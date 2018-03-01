@@ -13,7 +13,7 @@ const callback = (err, client) => {
   console.log('Connected');
 };
 
-mongoose.connect(url, {keepAlive: 15000, useMongoClient: true}, callback);
+mongoose.connect(url, {keepAlive: 15000}, callback);
 
 module.exports = {
   mongoose

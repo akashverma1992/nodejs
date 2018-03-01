@@ -3,11 +3,15 @@ const bodyparser = require('body-parser');
 const _ = require('lodash');
 // const { ObjectID } = require('mongodb');
 
+// local modules
 // mongodb ORM
 const { mongoose } = require('./db/config');
 
 // app User Model
 var { Users } = require('./models/user');
+
+// Middelware: Authenticate
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 const port = process.env.PORT || 3000;
@@ -30,10 +34,15 @@ app.post('/users', (req, res) => {
     // res.send(userDocument);
   }).then((token) => {
     // res.send(user);
-    res.header('Bearer', token).send(users);
+    res.header('x-auth', token).send(users);
   }).catch((err) => {
     res.status(400).send(err);
   });
+});
+
+// Grabbing Token
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 app.listen(port, () => {
