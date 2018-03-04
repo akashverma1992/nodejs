@@ -23,16 +23,18 @@ var UserSchema = mongoose.Schema({
     required: true,
     minLength: 6
   },
-  tokens: [{
-    access: {
-      type: String,
-      required: true
-    },
-    token: {
-      type: String,
-      required: true
+  tokens: [
+    {
+      access: {
+        type: String,
+        required: true
+      },
+      token: {
+        type: String,
+        required: true
+      }
     }
-  }]
+  ]
 });
 
 // toJson Overload
@@ -52,20 +54,22 @@ UserSchema.methods.generateAuthToken = function () {
     iss: 'express',
     access
   };
-  var token = jwt.sign(jwtPayLoad, 'salt').toString();
+  var token = jwt
+    .sign(jwtPayLoad, 'salt')
+    .toString();
 
-  user.tokens.push({
-    access,
-    token
-  });
+  user
+    .tokens
+    .push({access, token});
 
-  return user.save().then(() => {
-    return token;
-  });
+  return user
+    .save()
+    .then(() => {
+      return token;
+    });
 };
 
-// find user by token
-// static methods exist directly on model
+// find user by token static methods exist directly on model
 UserSchema.statics.findByToken = function (token) {
   var User = this;
   console.log(User);
@@ -83,8 +87,29 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
-// Model: 'Class used to construct documents'
-// compiling schema into model
+// MIDDELWARE: hashing passwords
+UserSchema.pre('save', function (next) {
+  var user = this;
+  if (user.isModified('password')) {
+    bcrypt
+      .genSalt(10)
+      .then((salt) => {
+        bcrypt
+          .hash(user.password, salt)
+          .then((hash) => {
+            user.password = hash;
+            next();
+          });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  } else {
+    next();
+  }
+});
+
+// Model: 'Class used to construct documents' compiling schema into model
 var Users = mongoose.model('Users', UserSchema);
 
 module.exports = {

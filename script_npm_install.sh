@@ -19,4 +19,6 @@ npm install
 cd ..
 
 #globals
+pwd
 npm i -g nodemon
+npm i -g jshint

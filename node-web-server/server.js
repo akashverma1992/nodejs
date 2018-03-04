@@ -56,7 +56,7 @@ app.use(express.static(__dirname + '/public'));
 // GET method route to respond with 'hello world'
 app.get('/', (req, res, next) => {
   // header
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', '*');
   // body
   // res.send('<h1>Hello World!</h1>');
   res.render('home.hbs', {

@@ -31,18 +31,18 @@ var genhash;
 // with promises
 bcrypt
   .genSalt(15)
-  .then(salt => {
+  .then((salt) => {
     gensalt = salt;
     console.log(gensalt);
-    bcrypt.hash(password, gensalt).then(hash => {
-      genhash = hash;
+    bcrypt.hash(password, gensalt).then((hash) => {
+      genhash = "$2a$15$uaY9BttOX97sxakkiGeL3e1tmtJ968FUlYjnZS2X3am9um.pldmT.";
       console.log(genhash);
-      bcrypt.compare(password, genhash).then(res => {
+      bcrypt.compare(password, genhash).then((res) => {
         console.log(res);
       });
     });
   })
-  .catch(e => {
+  .catch((e) => {
     console.log(e);
   });
 
