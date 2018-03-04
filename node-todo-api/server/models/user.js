@@ -1,3 +1,5 @@
+const {resolve} = require('dns');
+
 const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
@@ -64,12 +66,15 @@ UserSchema.methods.generateAuthToken = function () {
 
   return user
     .save()
-    .then(() => {
+    .then((res) => {
       return token;
+    })
+    .catch((e) => {
+      console.log(e);
     });
 };
 
-// find user by token static methods exist directly on model
+// STATIC: find user by token static methods exist directly on model
 UserSchema.statics.findByToken = function (token) {
   var User = this;
   console.log(User);
@@ -85,6 +90,23 @@ UserSchema.statics.findByToken = function (token) {
     'tokens.token': token,
     'tokens.access': 'auth'
   });
+};
+
+// STATIC: find current user's hashed password by email
+UserSchema.statics.findByCredentials = function (email, password) {
+  var User = this;
+  return User
+    .findOne({email})
+    .then((user) => {
+      if (!user) {
+        return Promise.reject();
+      }
+      return bcrypt
+        .compare(password, user.password)
+        .then((res) => {
+          return user;
+        });
+    });
 };
 
 // MIDDELWARE: hashing passwords
